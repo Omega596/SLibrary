@@ -57,7 +57,7 @@ namespace SLibrary
         {
             public string name;
             private int _age;
-            public int Age
+            public int age
             {
                 get { return _age; }
                 set
@@ -76,12 +76,12 @@ namespace SLibrary
             public Person(string name = "Unknown", int age = 1)
             {
                 this.name = name;
-                this.Age = age;
+                this.age = age;
             }
-            public void Print() => Console.WriteLine($"Имя: {name}, Возраст: {Age}");
+            public void Print() => Console.WriteLine($"Имя: {name}, Возраст: {age}");
             public void Deconstruct(out string personName, out int personAge)
             {
-                personAge = Age;
+                personAge = age;
                 personName = name;
             }
         }
