@@ -1,9 +1,58 @@
 ﻿
 namespace SLibrary
 {
-// TODO: Move this to git.
     namespace personData
     {
+        public delegate void AccountHandler(string text);
+        public class Account
+        {
+            public AccountHandler? handler;
+            public int sum = 0;
+            public Account(int sum)
+            {
+                this.sum = sum;
+            }
+            public void RegisterHandler(AccountHandler handler)
+            {
+                this.handler += handler;
+            }
+            public void UnregisterHandler(AccountHandler handler)
+            {
+                this.handler -= handler;
+            }
+            public void Add(int amount)
+            {
+                if (amount <= 0)
+                {
+                    Console.WriteLine($"Invalid amount, amount: {amount}");
+                }
+                else
+                {
+                    sum += amount;
+                    Console.WriteLine($"Successfully added money to your balance, current balance: {sum}");
+                }
+            }
+            public void Transation(int amount)
+            {
+                if (amount == 0 || amount < 0)
+                {
+                    handler?.Invoke($"Incorrect amount, amount: {amount}");
+                }
+                else if (sum < amount)
+                {
+                    handler?.Invoke($"Not enough money, current balance: {sum}");
+                }
+                else if (sum >= amount)
+                {
+                    sum -= amount;
+                    handler?.Invoke($"Sent money from your balance, current balance: {sum}");
+                }
+                else
+                {
+                    handler?.Invoke($"Error, please try later");
+                }
+            }
+        }
         public class Person
         {
             public string name;
