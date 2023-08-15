@@ -1,88 +1,77 @@
-﻿
+﻿using System.Text.RegularExpressions;
+
 namespace SLibrary
 {
     namespace personData
     {
-        public delegate void AccountHandler(string text);
         public class Account
         {
+            internal int AddUID = 0;
+            internal int TransactionUID = 1;
+            public delegate void AccountHandler(Account sender, AccountEventArgs e);
             public AccountHandler? handler;
             public int sum = 0;
+            AccountHandler? Notify;
+            public event AccountHandler? notify
+            {
+                add
+                {
+                    Notify += value;
+                    Console.WriteLine($"{value?.Method.Name} Added");
+                }
+                remove
+                {
+                    Notify -= value;
+                    Console.WriteLine($"{value?.Method.Name} Removed");
+                }
+            }
             public Account(int sum)
             {
                 this.sum = sum;
-            }
-            public void RegisterHandler(AccountHandler handler)
-            {
-                this.handler += handler;
-            }
-            public void UnregisterHandler(AccountHandler handler)
-            {
-                this.handler -= handler;
             }
             public void Add(int amount)
             {
                 if (amount <= 0)
                 {
-                    Console.WriteLine($"Invalid amount, amount: {amount}");
+                    Notify?.Invoke(this, new AccountEventArgs($"Invalid amount, amount: {amount}", sum, AddUID));
                 }
                 else
                 {
                     sum += amount;
-                    Console.WriteLine($"Successfully added money to your balance, current balance: {sum}");
+                    Notify?.Invoke(this, new AccountEventArgs($"Successfully added money to your balance, current balance: {sum}", sum, AddUID));
                 }
             }
             public void Transation(int amount)
             {
                 if (amount == 0 || amount < 0)
                 {
-                    handler?.Invoke($"Incorrect amount, amount: {amount}");
+                    Notify?.Invoke(this, new AccountEventArgs($"Incorrect amount, amount: {amount}", sum, TransactionUID));
                 }
                 else if (sum < amount)
                 {
-                    handler?.Invoke($"Not enough money, current balance: {sum}");
+                    Notify?.Invoke(this, new AccountEventArgs($"Not enough money, current balance: {sum}", sum, TransactionUID));
                 }
                 else if (sum >= amount)
                 {
                     sum -= amount;
-                    handler?.Invoke($"Sent money from your balance, current balance: {sum}");
+                    Notify?.Invoke(this, new AccountEventArgs($"Sent money from your balance, current balance: {sum}", sum, TransactionUID));
                 }
                 else
                 {
-                    handler?.Invoke($"Error, please try later");
+                    Notify?.Invoke(this, new AccountEventArgs($"Error, please try later", sum, TransactionUID));
                 }
             }
         }
-        public class Person
+        public class AccountEventArgs
         {
-            public string name;
-            private int _age;
-            public int age
+            public string? Message { get; }
+            public int? Sum { get; }
+            public int AccOpType;
+            public AccountEventArgs(string Message, int Sum, int AccOpType)
             {
-                get { return _age; }
-                set
-                {
-                    if (value > 164 || value < 0)
-                    {
-                        Console.WriteLine("Value must be in a range from 164 to 1");
-                        throw new ArgumentOutOfRangeException();
-                    }
-                    else
-                    {
-                        _age = value; 
-                    }
-                }
-            }
-            public Person(string name = "Unknown", int age = 1)
-            {
-                this.name = name;
-                this.age = age;
-            }
-            public void Print() => Console.WriteLine($"Имя: {name}, Возраст: {age}");
-            public void Deconstruct(out string personName, out int personAge)
-            {
-                personAge = age;
-                personName = name;
+                this.Sum = Sum;
+                this.Message = Message;
+                this.AccOpType = AccOpType;
             }
         }
     }
@@ -136,15 +125,34 @@ namespace SLibrary
                     default: throw new InvalidOperatorException("Invalid Operator", op);
                 }
             }
-        class InvalidOperatorException : ArgumentException
-        {
-            public int Op { get; }
-            public InvalidOperatorException(string message, int op)
-                : base(message)
+            class InvalidOperatorException : ArgumentException
             {
-                Op = op;
+                public int Op { get; }
+                public InvalidOperatorException(string message, int op)
+                    : base(message)
+                {
+                    Op = op;
+                }
             }
         }
+        public struct Seperator
+        {
+            public static string[] SeparateString(string input)
+            {
+                string[] words = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                return words;
+            }
+        }
+        public struct ArrayHelpers<T>
+        {
+            public T[] Fill(T[] array, T fill)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] = fill;
+                }
+                return array;
+            }
         }
     }
 }
