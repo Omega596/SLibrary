@@ -143,15 +143,49 @@ namespace SLibrary
                 return words;
             }
         }
-        public struct ArrayHelpers<T>
+        public static class ArrayExtensions
         {
-            public T[] Fill(T[] array, T fill)
+            public static void Fill<T>(this T[] array, T value)
             {
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = fill;
+                    array[i] = value;
                 }
-                return array;
+            }
+            public static void Fill<T>(this List<T> list, T value)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    list[i] = value;
+                }
+            }
+            public static List<int> findOccurrences(this string input, char character)
+            {
+                List<int> occurrences = new List<int>();
+                int index = -1;
+
+                do
+                {
+                    index = input.IndexOf(character, index + 1);
+                    if (index != -1)
+                    {
+                        occurrences.Add(index);
+                    }
+                } while (index != -1);
+
+                return occurrences;
+            }
+        }
+        public static class ObjectExtensions
+        {
+            public static void Freeze<T>(this T target)
+            {
+                
+                T permanentObject = target;
+                if ((bool)!target?.Equals(permanentObject))
+                {
+                    target = permanentObject;
+                }
             }
         }
     }
